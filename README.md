@@ -1,0 +1,8 @@
+# Edukit Rotary Inverted Pendulum Control System
+# An Open and Configurable System with Digital Motor Control Technology
+
+[Please view this Web site for complete information on Edukit](https://sites.google.com/view/ucla-st-motor-control/home)
+
+Control systems engineering increases in importance ever more rapidly with the appearance of self-driving vehicles, novel aerial vehicles, medical robotics, and countless consumer products. These applications require not only engineers with hands-on experience in control systems, but also very importantly, in the management and control of electric motor actuators and precise position sensors. Control systems engineering design skill relies on understanding of both theory and practice.  However, understanding of control systems practice through hands-on-experience, has not been readily available in the past.
+
+The Edukit Systems is a hands-on, low cost control system personal kit.  It includes capability for both classic control system design as well as state space modern control systems.  Both stable and unstable plants are included in the physical system. This is based on real time control hosted on an STM32 microprocessor system along with an accurate and highly configurable interface to a stepper motor actuator enabled by the STMicroelectronics L6474 integrated system.  The motor interface may be adjusted by design and also updated in real time during control action. The real time C code implementation is open and available for any advanced development.  Also, students, professional engineers, and controls researchers may apply Mathworks Matlab and Simulink to access the platform for real time graphical animated viewing of operation as well as for configuration and design. 
