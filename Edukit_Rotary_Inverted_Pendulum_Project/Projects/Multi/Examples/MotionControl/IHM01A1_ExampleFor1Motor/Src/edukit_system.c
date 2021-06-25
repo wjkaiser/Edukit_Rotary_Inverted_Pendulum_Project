@@ -1408,6 +1408,23 @@ void user_configuration(void){
 				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
+				enable_angle_cal = 0;
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
+				if (enable_angle_cal_resp == 0){
+					enable_angle_cal = 1;
+				}
+				sprintf(msg, "%i", enable_angle_cal_resp);
+				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+				if ( enable_angle_cal_resp < 0 ){
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+					HAL_Delay(3000);
+					NVIC_SystemReset();
+				}
+
+
 				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
@@ -1714,17 +1731,16 @@ void user_configuration(void){
 				enable_mod_sin_rotor_tracking = 0;
 				enable_rotor_chirp = 0;
 
-				if (select_suspended_mode == 0){
-					enable_angle_cal = 0;
-					sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
-					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
-					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
-					if (enable_angle_cal_resp == 0){
-						enable_angle_cal = 1;
-					}
-					sprintf(msg, "%i", enable_angle_cal_resp);
-					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+				enable_angle_cal = 0;
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
+				if (enable_angle_cal_resp == 0){
+					enable_angle_cal = 1;
 				}
+				sprintf(msg, "%i", enable_angle_cal_resp);
+				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+
 				if ( enable_angle_cal_resp < 0 ){
 					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);

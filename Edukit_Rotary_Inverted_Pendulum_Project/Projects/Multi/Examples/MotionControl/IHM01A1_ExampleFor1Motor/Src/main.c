@@ -1103,6 +1103,28 @@ int main(void) {
 		__HAL_DMA_RESET_HANDLE_STATE(&hdma_usart2_rx);
 
 		/*
+		 * Record user selected operation variable values.  Values will be
+		 * restored after Swing Up completion or after Angle Calibration
+		 * completion
+		 */
+
+		init_r_p_gain = rotor_pid->p_gain;
+		init_r_i_gain = rotor_pid->i_gain;
+		init_r_d_gain = rotor_pid->d_gain;
+		init_p_p_gain = pid_filter->p_gain;
+		init_p_i_gain = pid_filter->i_gain;
+		init_p_d_gain = pid_filter->d_gain;
+		init_enable_state_feedback = enable_state_feedback;
+		init_integral_compensator_gain = integral_compensator_gain;
+		init_feedforward_gain = feedforward_gain;
+		init_enable_state_feedback = enable_state_feedback;
+		init_enable_disturbance_rejection_step = enable_disturbance_rejection_step;
+		init_enable_sensitivity_fnc_step = enable_sensitivity_fnc_step;
+		init_enable_noise_rejection_step = enable_noise_rejection_step;
+		init_enable_rotor_plant_design = enable_rotor_plant_design;
+
+
+		/*
 		 * Initiate Pendulum Swing Up with automatic system requiring no user action
 		 *
 		 * This system was developed by Markus Dauberschmidt see
@@ -1110,27 +1132,9 @@ int main(void) {
 		 *
 		 */
 
+
 		if (enable_swing_up == 1 && select_suspended_mode == 0){
 
-			/*
-			 * Record user selected operation variable values.  Values will be
-			 * restored after Swing Up completion
-			 */
-
-			init_r_p_gain = rotor_pid->p_gain;
-			init_r_i_gain = rotor_pid->i_gain;
-			init_r_d_gain = rotor_pid->d_gain;
-			init_p_p_gain = pid_filter->p_gain;
-			init_p_i_gain = pid_filter->i_gain;
-			init_p_d_gain = pid_filter->d_gain;
-			init_enable_state_feedback = enable_state_feedback;
-			init_integral_compensator_gain = integral_compensator_gain;
-			init_feedforward_gain = feedforward_gain;
-			init_enable_state_feedback = enable_state_feedback;
-			init_enable_disturbance_rejection_step = enable_disturbance_rejection_step;
-			init_enable_sensitivity_fnc_step = enable_sensitivity_fnc_step;
-			init_enable_noise_rejection_step = enable_noise_rejection_step;
-			init_enable_rotor_plant_design = enable_rotor_plant_design;
 
 			/*
 			 * Apply controller parameters for initial operation at completion of
@@ -1403,6 +1407,7 @@ int main(void) {
 			}
 			if (select_suspended_mode == 1) {
 				encoder_position = encoder_position_steps - encoder_position_down;
+				encoder_position = encoder_position - encoder_position_offset;
 			}
 
 			/*  Detect pendulum position excursion exceeding limits and exit */
@@ -1758,7 +1763,7 @@ int main(void) {
 				 * Period.  User selected system state values restored after Angle Calibration
 				 */
 
-				if (i == 1){
+				if (i == 1 && select_suspended_mode == 0){
 					rotor_pid->p_gain = 21.1;
 					rotor_pid->i_gain = 0;
 					rotor_pid->d_gain = 17.2;
@@ -1771,6 +1776,21 @@ int main(void) {
 					rotor_position_command_steps = 0;
 					current_error_rotor_integral = 0;
 				}
+
+				if (i == 1 && select_suspended_mode == 1){
+					rotor_pid->p_gain = -23.86;
+					rotor_pid->i_gain = 0;
+					rotor_pid->d_gain = -19.2;
+					pid_filter->p_gain = -293.2;
+					pid_filter->i_gain = 0.0;
+					pid_filter->d_gain = -41.4;
+					enable_state_feedback = 1;
+					integral_compensator_gain = -11.45;
+					feedforward_gain = 1;
+					rotor_position_command_steps = 0;
+					current_error_rotor_integral = 0;
+				}
+
 
 				/* Initialize angle calibration variables */
 
