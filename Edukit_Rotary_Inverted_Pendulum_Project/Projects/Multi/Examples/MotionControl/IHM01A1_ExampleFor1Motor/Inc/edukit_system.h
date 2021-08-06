@@ -79,6 +79,7 @@
 #define RCC_SYS_CLOCK_FREQ 84000000 // should equal HAL_RCC_GetSysClockFreq()
 #define RCC_HCLK_FREQ 84000000 // should equal HAL_RCC_GetHCLKFreq()
 
+
 #define T_SAMPLE_DEFAULT 0.002
 
 #define ENABLE_HIGH_SPEED_SAMPLING_MODE 			0
@@ -139,8 +140,6 @@
 #define MAX_SPEED_MODE_5 2000
 #define MIN_SPEED_MODE_5 800
 
-#define ROTOR_POSITION_MAX_DIFF 1500 			// Limit of maximum permitted difference in motor command values on successive cycles
-
 #define ENABLE_SUSPENDED_PENDULUM_CONTROL 0     // Set to 0 for Inverted Pendulum Mode - Set to 1 for Suspended Pendulum Mode
 
 #define ENCODER_START_OFFSET 0 				// Encoder configurations may display up to 1 degree initial offset
@@ -178,8 +177,8 @@
  */
 
 #define ENABLE_PID_INTEGRATOR_LIMIT 0			// Enable PID filter integrator limit
-#define PRIMARY_WINDUP_LIMIT 1000				// Integrator wind up limits for PID controllers
-#define SECONDARY_WINDUP_LIMIT 1000				// Integrator wind up limits for PID controllers
+#define PRIMARY_WINDUP_LIMIT 1000				// Integrator wind up limits for PID Pendulum controller
+#define SECONDARY_WINDUP_LIMIT 1000				// Integrator wind up limits for PID Rotor controller
 
 /*
  * High Speed Mode Values: 5, 25, 30
@@ -334,7 +333,7 @@
 #define MOD_SIN_MODULATION_FREQ  0.02		// 0.02 default
 #define MOD_SIN_MODULATION_MIN 0			// Default 0
 /* Define for High Speed System */
-#define MOD_SIN_SAMPLE_RATE 500.0			// 500.0 default
+#define MOD_SIN_SAMPLE_RATE (1/T_SAMPLE_DEFAULT)  // Equals system sample rate
 #define ENABLE_SIN_MOD 1					// 1 default
 
 #define ENABLE_ROTOR_CHIRP 0				// If selected, disable all other modulation inputs
@@ -343,7 +342,7 @@
 #define ROTOR_CHIRP_PERIOD 20000			// 20000 default
 #define ROTOR_CHIRP_SWEEP_DELAY 1000		// 0 default - enables control system to recover between sweeps
 /* Define for High Speed System */
-#define ROTOR_CHIRP_SAMPLE_RATE 500.0		// 500.0 default for Low Speed
+#define ROTOR_CHIRP_SAMPLE_RATE (1/T_SAMPLE_DEFAULT)  // Equals system sample rate
 #define ROTOR_CHIRP_START_CYCLES 			// 0 default
 #define ROTOR_CHIRP_STEP_AMPLITUDE 2  		// 0.3 default
 
@@ -353,7 +352,7 @@
 #define ROTOR_TRACK_COMB_SIGNAL_AMPLITUDE 5.0			// 0.05 default
 
 #define ENABLE_DISTURBANCE_REJECTION_STEP 	1
-#define LOAD_DISTURBANCE_SENSITIVITY_SCALE 	5			// Scale factor applied to increase measurement resolution for Load Disturbance Sensitivity Function
+#define LOAD_DISTURBANCE_SENSITIVITY_SCALE 	1			// Scale factor applied to increase measurement resolution for Load Disturbance Sensitivity Function
 
 /*
  * Set ENABLE_ENCODER_TEST to 1 to enable a testing of encoder response for verification
@@ -396,7 +395,7 @@
 #define ROTOR_POSITION_IMPULSE_RESPONSE_CYCLE_PERIOD 500 		// Duration of impulse in cycles
 #define ROTOR_POSITION_IMPULSE_RESPONSE_CYCLE_INTERVAL 5000	    // Interval between impulse events in cycles
 /* Define for High Speed System */
-#define ROTOR_IMPULSE_SAMPLE_RATE 500							// Default sample rate
+#define ROTOR_IMPULSE_SAMPLE_RATE (1/T_SAMPLE_DEFAULT)  		// Equals system sample rate							// Default sample rate
 /*
  * Setting ENABLE_PENDULUM_POSITION_IMPULSE_RESPONSE_CYCLE = 1 applies a Pendulum Position tracking
  * command input impulse signal
@@ -407,7 +406,7 @@
 #define PENDULUM_POSITION_IMPULSE_RESPONSE_CYCLE_PERIOD 2		// Duration of impulse in cycles
 #define PENDULUM_POSITION_IMPULSE_RESPONSE_CYCLE_INTERVAL 18000	// Interval between impulse events in cycles
 /* Define for High Speed System */
-#define PENDULUM_IMPULSE_SAMPLE_RATE 500 						// Default sample rate
+#define PENDULUM_IMPULSE_SAMPLE_RATE (1/T_SAMPLE_DEFAULT)       // Equals system sample rate 						// Default sample rate
 
 /*
  * DATA_REPORT_SPEED_SCALE enables reduced data rate for bandwidth constrained data acquisition systems
@@ -424,30 +423,25 @@
 #define SERIAL_MSG_EOF          '\r'
 
 /*
- * 		Data Structure of PID Controller with low pass filter operating
- * 		on derivative component
+ * Structure for the augmented floating-point PID Control.
+ * This includes additional state associated with derivative filter
+ *
+ * This follows the ARM CMSIS architecture
  */
 
-typedef struct {
-	float p_gain;
-	float i_gain;
-	float integrator_windup_limit;
-	int warn;
-	float d_gain;
-	float previous_error;
-	float previous_derivative;
-	float differential;
-	float differential_filter;
-	float previous_differential_filter;
-	float i_error;
-	float p_term, i_term, d_term;
-	float control_output;
-} pid_filter_control_parameters;
+typedef struct
+{
+  float state_a[4];  /** The filter state array of length 4. */
+  float Kp;          /** The proportional gain. */
+  float Ki;          /** The integral gain. */
+  float Kd;          /** The derivative gain. */
+  float int_term;    /** The controller integral output */
+  float control_output; /** The controller output */
+} arm_pid_instance_a_f32;
 
 
-extern void pid_filter_value_config(pid_filter_control_parameters * pid_filter);
-extern void pid_filter_control_execute(pid_filter_control_parameters * pid_filter,
-		float * current_error, float * sample_period, float * f_deriv_lp);
+extern void pid_filter_control_execute(arm_pid_instance_a_f32 *PID, float * current_error,
+		float * sample_period, float * Deriv_Filt);
 
 extern int encoder_position_read(int *encoder_position, int encoder_position_init, TIM_HandleTypeDef *htim3);
 extern int rotor_position_read(int *rotor_position);
@@ -470,13 +464,13 @@ extern void interactive_rotor_actuator_control(void);
 
 extern void user_configuration(void);
 extern int mode_index_identification(char * user_config_input, int config_command_control, float *adjust_increment,
-		pid_filter_control_parameters * pid_filter, pid_filter_control_parameters * rotor_pid);
-extern void assign_mode_1(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid);
-extern void assign_mode_2(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid);
-extern void assign_mode_3(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid);
+		arm_pid_instance_a_f32 *PID_Pend, arm_pid_instance_a_f32 *PID_Rotor);
+extern void assign_mode_1(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor);
+extern void assign_mode_2(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor);
+extern void assign_mode_3(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor);
 
 extern bool oppositeSigns(int x, int y);
 
@@ -680,7 +674,6 @@ int slope_prev;
 float encoder_angle_slope_corr_steps;
 
 /* Adaptive control variables */
-
 float adaptive_error, adaptive_threshold_low, adaptive_threshold_high;
 float error_sum_prev, error_sum, error_sum_filter_prev, error_sum_filter;
 int adaptive_entry_tick, adaptive_dwell_period;
@@ -763,6 +756,7 @@ int enable_disturbance_rejection_step;
 int enable_noise_rejection_step;
 int enable_plant_rejection_step;
 int enable_sensitivity_fnc_step;
+float load_disturbancse_sensitivity_scale;
 
 
 
@@ -908,4 +902,10 @@ char mode_string_mode_load_dist_step[UART_RX_BUFFER_SIZE];
 char mode_string_mode_noise_dist_step[UART_RX_BUFFER_SIZE];
 char mode_string_mode_plant_dist_step[UART_RX_BUFFER_SIZE];
 char mode_string_stop[UART_RX_BUFFER_SIZE];
+
+/* CMSIS Variables */
+arm_pid_instance_a_f32 PID_Pend, PID_Rotor;
+float Deriv_Filt_Pend[2];
+float Deriv_Filt_Rotor[2];
+float Wo_t, fo_t, IWon_t;
 

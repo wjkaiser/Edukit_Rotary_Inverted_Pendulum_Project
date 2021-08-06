@@ -75,89 +75,36 @@
 #include <math.h>
 #include <stdlib.h>
 
-
-/*
- * PID Controller data structure initialization
- */
-
-void pid_filter_value_config(pid_filter_control_parameters * pid_filter) {
-	pid_filter->i_error = 0;
-	pid_filter->previous_error = 0;
-	pid_filter->previous_derivative = 0;
-	pid_filter->differential = 0;
-	pid_filter->previous_differential_filter = 0;
-	pid_filter->differential_filter = 0;
-}
-
-
 /*
  * PID Controller with low pass filter operating on derivative component
  */
 
-void pid_filter_control_execute(pid_filter_control_parameters * pid_filter,
-		float * current_error, float * sample_period, float * f_deriv_lp) {
-	float fo, Wo, IWon, iir_0, iir_1, iir_2;
+__INLINE void pid_filter_control_execute(arm_pid_instance_a_f32 *PID, float * current_error,
+		float * sample_period, float * Deriv_Filt) {
 
-	/*
-	 * f_deriv_lp pointer to variable containing low pass filter corner frequency
-	 */
-	fo = *f_deriv_lp;
-	Wo = 2 * 3.141592654 * fo;
-	IWon = 2 / (Wo * (*sample_period));
-	iir_0 = 1 / (1 + IWon);
-	iir_1 = iir_0;
-	iir_2 = iir_0 * (1 - IWon);
+		float int_term, diff, diff_filt;
 
-	/*
-	 * Compute integral error by trapezoidal integration
-	 */
+	  /* Compute time integral of error by trapezoidal rule */
+	  int_term = PID->Ki*(*sample_period)*((*current_error) + PID->state_a[0])/2;
 
-	pid_filter->i_error += ((*current_error + pid_filter->previous_error)/2) * (*sample_period);
+	  /* Compute time derivative of error */
+	  diff = PID->Kd*((*current_error) - PID->state_a[0])/(*sample_period);
 
-	/*
-	 * Optional Limit integrator error
-	 *
-	 * Provide warn state in pid->warn
-	 *
-	 * Warn state may be applied in system characterization and operation
-	 *
-	 */
+	  /* Compute first order low pass filter of time derivative */
+	  diff_filt = Deriv_Filt[0] * diff
+				+ Deriv_Filt[0] * PID->state_a[2]
+				- Deriv_Filt[1] * PID->state_a[3];
 
-	if (ENABLE_PID_INTEGRATOR_LIMIT == 1){
-		pid_filter->warn = 0;
-		if (pid_filter->i_error < -(pid_filter->integrator_windup_limit)) {
-			pid_filter->i_error = -(pid_filter->integrator_windup_limit);
-			pid_filter->warn = -1;
-		} else if (pid_filter->i_error > pid_filter->integrator_windup_limit) {
-			pid_filter->i_error = pid_filter->integrator_windup_limit;
-			pid_filter->warn = 1;
-		}
-	}
+	  /* Accumulate PID output with Integral, Derivative and Proportional contributions*/
 
+	  PID->control_output = diff_filt + int_term + PID->Kp*(*current_error);
 
-	/*
-	 * Compute derivative, proportional, and integral terms
-	 */
-
-	/*
-	 * Introduce Low Pass Filter of derivative signal
-	 */
-
-	pid_filter->differential = ((*current_error - pid_filter->previous_error)
-			/ (*sample_period));
-	pid_filter->differential_filter = iir_0 * pid_filter->differential
-			+ iir_1 * pid_filter->previous_derivative
-			- iir_2 * pid_filter->previous_differential_filter;
-
-	pid_filter->previous_derivative = pid_filter->differential;
-	pid_filter->previous_differential_filter = pid_filter->differential_filter;
-	pid_filter->previous_error = *current_error;
-
-	pid_filter->d_term = (pid_filter->d_gain * pid_filter->differential_filter);
-	pid_filter->p_term = (pid_filter->p_gain * (*current_error));
-	pid_filter->i_term = (pid_filter->i_gain * pid_filter->i_error);
-	pid_filter->control_output = pid_filter->p_term + pid_filter->i_term
-			+ pid_filter->d_term;
+	  /* Update state variables */
+	  PID->state_a[1] = PID->state_a[0];
+	  PID->state_a[0] = *current_error;
+	  PID->state_a[2] = diff;
+	  PID->state_a[3] = diff_filt;
+	  PID->int_term = int_term;
 }
 
 
@@ -170,7 +117,7 @@ void pid_filter_control_execute(pid_filter_control_parameters * pid_filter,
  *
  */
 
-int encoder_position_read(int *encoder_position, int encoder_position_init, TIM_HandleTypeDef *htim3) {
+__INLINE int encoder_position_read(int *encoder_position, int encoder_position_init, TIM_HandleTypeDef *htim3) {
 
 	cnt3 = __HAL_TIM_GET_COUNTER(htim3);
 
@@ -197,7 +144,6 @@ int encoder_position_read(int *encoder_position, int encoder_position_init, TIM_
 	 *  Detect if we passed the bottom, then re-arm peak flag
 	 *  oppositeSigns returns true when we pass the bottom position
 	 */
-
 
 
 	if (oppositeSigns(*encoder_position, previous_encoder_position))
@@ -238,7 +184,7 @@ int encoder_position_read(int *encoder_position, int encoder_position_init, TIM_
  * Developed and provided by Markus Dauberschmidt
  */
 
-bool oppositeSigns(int x, int y) {
+__INLINE bool oppositeSigns(int x, int y) {
 	return ((x ^ y) < 0);
 }
 
@@ -261,7 +207,7 @@ void rotor_position_set(void) {
  *
  */
 
-int rotor_position_read(int *rotor_position) {
+__INLINE int rotor_position_read(int *rotor_position) {
 	uint32_t rotor_position_u;
 	int range_error;
 	rotor_position_u = BSP_MotorControl_GetPosition(0);
@@ -365,8 +311,8 @@ void read_char(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint3
 	}
 }
 
-void assign_mode_1(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid){
+void assign_mode_1(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor){
 	select_suspended_mode = 0;
 	proportional = PRIMARY_PROPORTIONAL_MODE_1;
 	integral = PRIMARY_INTEGRAL_MODE_1;
@@ -374,18 +320,18 @@ void assign_mode_1(pid_filter_control_parameters * pid_filter,
 	rotor_p_gain = SECONDARY_PROPORTIONAL_MODE_1;
 	rotor_i_gain = SECONDARY_INTEGRAL_MODE_1;
 	rotor_d_gain = SECONDARY_DERIVATIVE_MODE_1;
-	pid_filter->p_gain = proportional;
-	pid_filter->i_gain = integral;
-	pid_filter->d_gain = derivative;
-	rotor_pid->p_gain = rotor_p_gain;
-	rotor_pid->i_gain = rotor_i_gain;
-	rotor_pid->d_gain = rotor_d_gain;
+	PID_Pend->Kp = proportional;
+	PID_Pend->Ki = integral;
+	PID_Pend->Kd = derivative;
+	PID_Rotor->Kp = rotor_p_gain;
+	PID_Rotor->Ki = rotor_i_gain;
+	PID_Rotor->Kd = rotor_d_gain;
 	torq_current_val = MAX_TORQUE_CONFIG;
 	L6474_SetAnalogValue(0, L6474_TVAL, torq_current_val);
 }
 
-void assign_mode_2(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid){
+void assign_mode_2(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor){
 	select_suspended_mode = 0;
 	proportional = PRIMARY_PROPORTIONAL_MODE_2;
 	integral = PRIMARY_INTEGRAL_MODE_2;
@@ -393,18 +339,18 @@ void assign_mode_2(pid_filter_control_parameters * pid_filter,
 	rotor_p_gain = SECONDARY_PROPORTIONAL_MODE_2;
 	rotor_i_gain = SECONDARY_INTEGRAL_MODE_2;
 	rotor_d_gain = SECONDARY_DERIVATIVE_MODE_2;
-	pid_filter->p_gain = proportional;
-	pid_filter->i_gain = integral;
-	pid_filter->d_gain = derivative;
-	rotor_pid->p_gain = rotor_p_gain;
-	rotor_pid->i_gain = rotor_i_gain;
-	rotor_pid->d_gain = rotor_d_gain;
+	PID_Pend->Kp = proportional;
+	PID_Pend->Ki = integral;
+	PID_Pend->Kd = derivative;
+	PID_Rotor->Kp = rotor_p_gain;
+	PID_Rotor->Ki = rotor_i_gain;
+	PID_Rotor->Kd = rotor_d_gain;
 	torq_current_val = MAX_TORQUE_CONFIG;
 	L6474_SetAnalogValue(0, L6474_TVAL, torq_current_val);
 }
 
-void assign_mode_3(pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid){
+void assign_mode_3(arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor){
 	select_suspended_mode = 0;
 	proportional = PRIMARY_PROPORTIONAL_MODE_3;
 	integral = PRIMARY_INTEGRAL_MODE_3;
@@ -412,12 +358,12 @@ void assign_mode_3(pid_filter_control_parameters * pid_filter,
 	rotor_p_gain = SECONDARY_PROPORTIONAL_MODE_3;
 	rotor_i_gain = SECONDARY_INTEGRAL_MODE_3;
 	rotor_d_gain = SECONDARY_DERIVATIVE_MODE_3;
-	pid_filter->p_gain = proportional;
-	pid_filter->i_gain = integral;
-	pid_filter->d_gain = derivative;
-	rotor_pid->p_gain = rotor_p_gain;
-	rotor_pid->i_gain = rotor_i_gain;
-	rotor_pid->d_gain = rotor_d_gain;
+	PID_Pend->Kp = proportional;
+	PID_Pend->Ki = integral;
+	PID_Pend->Kd = derivative;
+	PID_Rotor->Kp = rotor_p_gain;
+	PID_Rotor->Ki = rotor_i_gain;
+	PID_Rotor->Kd = rotor_d_gain;
 	torq_current_val = MAX_TORQUE_CONFIG;
 	L6474_SetAnalogValue(0, L6474_TVAL, torq_current_val);
 }
@@ -430,50 +376,50 @@ void assign_mode_3(pid_filter_control_parameters * pid_filter,
  */
 
 int mode_index_identification(char * user_config_input, int config_command_control,
-		float *adjust_increment, pid_filter_control_parameters * pid_filter,
-		pid_filter_control_parameters * rotor_pid){
+		float *adjust_increment, arm_pid_instance_a_f32 *PID_Pend,
+		arm_pid_instance_a_f32 *PID_Rotor){
 
 	if (strcmp(user_config_input, mode_string_inc_pend_p) == 0){
-		pid_filter->p_gain = pid_filter->p_gain + *adjust_increment;
+		PID_Pend->Kp = PID_Pend->Kp + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_pend_p) == 0) {
-		pid_filter->p_gain = pid_filter->p_gain - *adjust_increment;
-		//if (pid_filter->p_gain <= 0) { pid_filter->p_gain = 0; }
+		PID_Pend->Kp = PID_Pend->Kp - *adjust_increment;
+		//if (PID_Pend->Kp <= 0) { PID_Pend->Kp = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_inc_pend_d) == 0) {
-		pid_filter->d_gain = pid_filter->d_gain + *adjust_increment;
+		PID_Pend->Kd = PID_Pend->Kd + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_pend_d) == 0) {
-		pid_filter->d_gain = pid_filter->d_gain - *adjust_increment;
-		//if (pid_filter->d_gain <= 0) { pid_filter->d_gain = 0; }
+		PID_Pend->Kd = PID_Pend->Kd - *adjust_increment;
+		//if (PID_Pend->Kd <= 0) { PID_Pend->Kd = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_inc_pend_i) == 0) {
-		pid_filter->i_gain = pid_filter->i_gain + *adjust_increment;
+		PID_Pend->Ki = PID_Pend->Ki + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_pend_i) == 0) {
-		pid_filter->i_gain = pid_filter->i_gain - *adjust_increment;
-		//if (pid_filter->i_gain <= 0) { pid_filter->i_gain = 0; }
+		PID_Pend->Ki = PID_Pend->Ki - *adjust_increment;
+		//if (PID_Pend->Ki <= 0) { PID_Pend->Ki = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_inc_rotor_p) == 0){
-		rotor_pid->p_gain = rotor_pid->p_gain + *adjust_increment;
+		PID_Rotor->Kp = PID_Rotor->Kp + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_rotor_p) == 0) {
-		rotor_pid->p_gain = rotor_pid->p_gain - *adjust_increment;
-		//if (rotor_pid->p_gain <= 0) { rotor_pid->p_gain = 0; }
+		PID_Rotor->Kp = PID_Rotor->Kp - *adjust_increment;
+		//if (PID_Rotor->Kp <= 0) { PID_Rotor->Kp = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_inc_rotor_d) == 0) {
-		rotor_pid->d_gain = rotor_pid->d_gain + *adjust_increment;
+		PID_Rotor->Kd = PID_Rotor->Kd + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_rotor_d) == 0) {
-		rotor_pid->d_gain = rotor_pid->d_gain - *adjust_increment;
-		//if (rotor_pid->d_gain <= 0) { rotor_pid->d_gain = 0; }
+		PID_Rotor->Kd = PID_Rotor->Kd - *adjust_increment;
+		//if (PID_Rotor->Kd <= 0) { PID_Rotor->Kd = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_inc_rotor_i) == 0) {
-		rotor_pid->i_gain = rotor_pid->i_gain + *adjust_increment;
+		PID_Rotor->Ki = PID_Rotor->Ki + *adjust_increment;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_rotor_i) == 0) {
-		rotor_pid->i_gain = rotor_pid->i_gain - *adjust_increment;
-		//if (rotor_pid->i_gain <= 0) { rotor_pid->i_gain = 0; }
+		PID_Rotor->Ki = PID_Rotor->Ki - *adjust_increment;
+		//if (PID_Rotor->Ki <= 0) { PID_Rotor->Ki = 0; }
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_dec_torq_c) == 0) {
 		torq_current_val = L6474_GetAnalogValue(0, L6474_TVAL);
@@ -565,12 +511,12 @@ int mode_index_identification(char * user_config_input, int config_command_contr
 		L6474_SetAcceleration(0, MAX_ACCEL);
 		L6474_SetMinSpeed(0, MIN_SPEED_MODE_5);
 		L6474_SetMaxSpeed(0, MAX_SPEED_MODE_5);
-		pid_filter->p_gain = PRIMARY_PROPORTIONAL_MODE_5;
-		pid_filter->i_gain = PRIMARY_INTEGRAL_MODE_5;
-		pid_filter->d_gain = PRIMARY_DERIVATIVE_MODE_5;
-		rotor_pid->p_gain = SECONDARY_PROPORTIONAL_MODE_5;
-		rotor_pid->i_gain = SECONDARY_INTEGRAL_MODE_5;
-		rotor_pid->d_gain = SECONDARY_DERIVATIVE_MODE_5;
+		PID_Pend->Kp = PRIMARY_PROPORTIONAL_MODE_5;
+		PID_Pend->Ki = PRIMARY_INTEGRAL_MODE_5;
+		PID_Pend->Kd = PRIMARY_DERIVATIVE_MODE_5;
+		PID_Rotor->Kp = SECONDARY_PROPORTIONAL_MODE_5;
+		PID_Rotor->Ki = SECONDARY_INTEGRAL_MODE_5;
+		PID_Rotor->Kd = SECONDARY_DERIVATIVE_MODE_5;
 		enable_adaptive_mode = 0;
 		config_command = 1;
 	} else if (strcmp(user_config_input, mode_string_enable_step ) == 0 ){
