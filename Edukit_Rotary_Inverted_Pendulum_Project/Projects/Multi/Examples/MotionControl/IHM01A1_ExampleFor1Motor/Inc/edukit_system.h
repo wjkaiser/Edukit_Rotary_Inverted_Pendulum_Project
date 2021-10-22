@@ -352,7 +352,7 @@
 #define ROTOR_TRACK_COMB_SIGNAL_AMPLITUDE 5.0			// 0.05 default
 
 #define ENABLE_DISTURBANCE_REJECTION_STEP 	1
-#define LOAD_DISTURBANCE_SENSITIVITY_SCALE 	1			// Scale factor applied to increase measurement resolution for Load Disturbance Sensitivity Function
+#define LOAD_DISTURBANCE_SENSITIVITY_SCALE 	20			// Scale factor applied to increase measurement resolution for Load Disturbance Sensitivity Function
 
 /*
  * Set ENABLE_ENCODER_TEST to 1 to enable a testing of encoder response for verification
@@ -550,7 +550,6 @@ uint32_t readBytes;
 float rotor_control_target_steps;
 float rotor_control_target_steps_curr;
 float rotor_control_target_steps_prev;
-float rotor_control_target_steps_lp_filter, rotor_control_target_steps_lp_filter_prev;
 
 /* Control system variables */
 int rotor_position_delta;
@@ -660,6 +659,7 @@ int init_enable_disturbance_rejection_step;
 int init_enable_sensitivity_fnc_step;
 int init_enable_noise_rejection_step;
 int init_enable_rotor_plant_design;
+int init_enable_rotor_plant_gain_design;
 
 
 /* Low pass filter variables */
@@ -756,7 +756,7 @@ int enable_disturbance_rejection_step;
 int enable_noise_rejection_step;
 int enable_plant_rejection_step;
 int enable_sensitivity_fnc_step;
-float load_disturbancse_sensitivity_scale;
+float load_disturbance_sensitivity_scale;
 
 
 

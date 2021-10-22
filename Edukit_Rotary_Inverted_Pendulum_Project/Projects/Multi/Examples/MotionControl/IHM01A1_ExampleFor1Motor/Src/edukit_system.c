@@ -311,6 +311,15 @@ void read_char(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint3
 	}
 }
 
+/*
+ * Assign operating modes for
+ * 			PID Output Feedback Mode 1
+ * 			PID Output Feedback Mode 2
+ * 			PID Output Feedback Mode 3
+ *
+ * Mode assignments may be user configured below
+ */
+
 void assign_mode_1(arm_pid_instance_a_f32 *PID_Pend,
 		arm_pid_instance_a_f32 *PID_Rotor){
 	select_suspended_mode = 0;
@@ -1969,7 +1978,9 @@ void user_configuration(void){
 					}
 				}
 
-				 */
+				*/
+
+
 
 				if (enable_rotor_plant_gain_design == 0 && enable_rotor_plant_design == 0 && enable_state_feedback == 1){
 

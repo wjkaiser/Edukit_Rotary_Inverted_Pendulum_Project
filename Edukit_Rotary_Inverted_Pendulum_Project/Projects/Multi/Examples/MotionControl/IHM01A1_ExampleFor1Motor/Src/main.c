@@ -400,7 +400,6 @@ int main(void) {
 
 	/*Initialize rotor plant design transfer function computation variables */
 	rotor_control_target_steps_filter_prev_2 = 0.0;
-	rotor_control_target_steps_lp_filter_prev = 0.0;
 	rotor_control_target_steps_filter_prev_prev_2 = 0.0;
 	rotor_control_target_steps_prev_prev = 0.0;
 
@@ -823,17 +822,20 @@ int main(void) {
 		      iir_1_r = iir_0_r;
 		      iir_2_r = iir_0_r * (1 - IWon_r);
 		}
-		 */
+		*/
 
-		/* Optional display coefficients for rotor plant design transfer function
+		/*
+
+		//Optional display coefficients for rotor plant design transfer function
 		sprintf(tmp_string, "\n\rEnable Design: %i iir_0 %0.4f iir_1 %0.4f iir_2 %0.4f\n\r", enable_rotor_plant_design, iir_0_r, iir_1_r, iir_2_r);
 		HAL_UART_Transmit(&huart2, (uint8_t*) tmp_string, strlen(tmp_string), HAL_MAX_DELAY);
-		 */
 
-		/* Optional display coefficients for rotor plant design transfer function
+
+		//Optional display coefficients for rotor plant design transfer function
 		sprintf(tmp_string,
 				"\n\ra0 %0.4f c0 %0.4f c1 %0.4f c2 %0.4f c3 %0.4f c4 %0.4f\n\r", ao, c0, c1, c2, c3, c4);
 		HAL_UART_Transmit(&huart2, (uint8_t*) tmp_string, strlen(tmp_string), HAL_MAX_DELAY);
+
 		 */
 
 
@@ -1050,6 +1052,18 @@ int main(void) {
 
 		*current_error_steps = 0;
 		*current_error_rotor_steps = 0;
+		PID_Pend.state_a[0] = 0;
+		PID_Pend.state_a[1] = 0;
+		PID_Pend.state_a[2] = 0;
+		PID_Pend.state_a[3] = 0;
+		PID_Pend.int_term = 0;
+		PID_Pend.control_output = 0;
+		PID_Rotor.state_a[0] = 0;
+		PID_Rotor.state_a[1] = 0;
+		PID_Rotor.state_a[2] = 0;
+		PID_Rotor.state_a[3] = 0;
+		PID_Rotor.int_term = 0;
+		PID_Rotor.control_output = 0;
 
 		/* Initialize Pendulum PID control state */
 		pid_filter_control_execute(&PID_Pend, current_error_steps, sample_period,
@@ -1138,12 +1152,13 @@ int main(void) {
 		init_enable_sensitivity_fnc_step = enable_sensitivity_fnc_step;
 		init_enable_noise_rejection_step = enable_noise_rejection_step;
 		init_enable_rotor_plant_design = enable_rotor_plant_design;
+		init_enable_rotor_plant_gain_design = enable_rotor_plant_gain_design;
 
 		if(select_suspended_mode == 1){
-			load_disturbancse_sensitivity_scale = 1.0;
+			load_disturbance_sensitivity_scale = 1.0;
 		}
 		if(select_suspended_mode == 0){
-			load_disturbancse_sensitivity_scale = LOAD_DISTURBANCE_SENSITIVITY_SCALE;
+			load_disturbance_sensitivity_scale = LOAD_DISTURBANCE_SENSITIVITY_SCALE;
 		}
 
 
@@ -1178,6 +1193,7 @@ int main(void) {
 			enable_sensitivity_fnc_step = 0;
 			enable_noise_rejection_step = 0;
 			enable_rotor_plant_design = 0;
+			enable_rotor_plant_gain_design = 0;
 
 			/* Set Torque Current value to 800 mA (normal operation will revert to 400 mA */
 			torq_current_val = MAX_TORQUE_SWING_UP;
@@ -1269,7 +1285,6 @@ int main(void) {
 			}
 		}
 
-
 		/*
 		 * *************************************************************************************************
 		 *
@@ -1287,6 +1302,12 @@ int main(void) {
 			L6474_Board_SetDirectionGpio(0, BACKWARD);
 		}
 
+		/*
+		 * Set Torque Current to value for normal operation
+		 */
+		torq_current_val = MAX_TORQUE_CONFIG;
+		L6474_SetAnalogValue(0, L6474_TVAL, torq_current_val);
+
 		target_cpu_cycle = DWT->CYCCNT;
 		prev_cpu_cycle = DWT->CYCCNT;
 
@@ -1297,6 +1318,7 @@ int main(void) {
 		}
 
 		while (enable_control_action == 1) {
+
 
 			/*
 			 *
@@ -1320,13 +1342,7 @@ int main(void) {
 				enable_sensitivity_fnc_step = init_enable_sensitivity_fnc_step;
 				enable_noise_rejection_step = init_enable_noise_rejection_step;
 				enable_rotor_plant_design = init_enable_rotor_plant_design;
-				/*
-				 * Set Torque Current to value for normal operation
-				 */
-				torq_current_val = MAX_TORQUE_CONFIG;
-				L6474_SetAnalogValue(0, L6474_TVAL, torq_current_val);
-				sprintf(tmp_string,"Control Start\r\n");
-				HAL_UART_Transmit(&huart2, (uint8_t*) tmp_string, strlen(tmp_string), HAL_MAX_DELAY);
+				enable_rotor_plant_gain_design = init_enable_rotor_plant_gain_design;
 			}
 
 			/*
@@ -2001,7 +2017,7 @@ int main(void) {
 				 *
 				 */
 				if (enable_disturbance_rejection_step == 1){
-					rotor_control_target_steps = rotor_control_target_steps + rotor_position_command_steps * load_disturbancse_sensitivity_scale;
+					rotor_control_target_steps = rotor_control_target_steps + rotor_position_command_steps * load_disturbance_sensitivity_scale;
 				}
 			}
 
@@ -2020,14 +2036,17 @@ int main(void) {
 
 
 			/*
+			 *
 			 * Plant transfer function design based on two stage first order high pass IIR
-			 * filter structures applied to rotor_control_target_steps
+			 * filter structures applied to rotor_control_target_steps.
+			 *
+			 * Second order system computed at all cycle times to avoid transient upon switching between
+			 * operating modes with and without Rotor Plant Design enabled
+			 *
 			 */
 
 
-			if (enable_rotor_plant_design == 1){
-
-				if (rotor_damping_coefficient != 0 || rotor_natural_frequency != 0){
+			if (rotor_damping_coefficient != 0 || rotor_natural_frequency != 0){
 
 					rotor_control_target_steps_filter_2 = c0*rotor_control_target_steps + c1*rotor_control_target_steps_prev
 							+ c2*rotor_control_target_steps_prev_prev + c3*rotor_control_target_steps_filter_prev_2
@@ -2036,11 +2055,9 @@ int main(void) {
 					rotor_control_target_steps_prev_prev = rotor_control_target_steps_prev;
 					rotor_control_target_steps_filter_prev_prev_2 = rotor_control_target_steps_filter_prev_2;
 					rotor_control_target_steps_filter_prev_2 = rotor_control_target_steps_filter_2;
-				}
 			}
 
-
-			if ((enable_rotor_plant_design == 2 || enable_rotor_plant_design == 3)){
+			if ((enable_rotor_plant_design == 2 )){
 				rotor_control_target_steps_filter_2 = iir_0_r*rotor_control_target_steps + iir_1_r*rotor_control_target_steps_prev
 						- iir_2_r*rotor_control_target_steps_filter_prev_2;
 				rotor_control_target_steps_filter_prev_2 = rotor_control_target_steps_filter_2;
@@ -2049,7 +2066,8 @@ int main(void) {
 
 			/*
 			 * Record current value of rotor_position_command tracking signal
-			 * and control signal, rotor_control_target_steps for performance monitoring and adaptive control
+			 * and control signal, rotor_control_target_steps for rotor position
+			 * rotor position filters, rotor plant design, performance monitoring and adaptive control
 			 */
 
 			rotor_control_target_steps_prev = rotor_control_target_steps;
@@ -2060,9 +2078,11 @@ int main(void) {
 				if (enable_rotor_plant_design != 0){
 					rotor_control_target_steps_filter_2 = rotor_plant_gain*rotor_control_target_steps_filter_2;
 					apply_acceleration(&rotor_control_target_steps_filter_2, &target_velocity_prescaled, Tsample);
+				/* Applies if Rotor Gain defined */
 				} else if (enable_rotor_plant_gain_design == 1){
 					rotor_control_target_steps_gain = rotor_plant_gain * rotor_control_target_steps;
 					apply_acceleration(&rotor_control_target_steps_gain, &target_velocity_prescaled, Tsample);
+				/* Applies if no Rotor Design is selected */
 				} else {
 					apply_acceleration(&rotor_control_target_steps, &target_velocity_prescaled, Tsample);
 				}
@@ -2149,7 +2169,7 @@ int main(void) {
 			}
 
 			/* Select display parameter corresponding to requested selection of Sensitivity Functions */
-			if (enable_disturbance_rejection_step == 1) { display_parameter = rotor_position_steps; }
+			if (enable_disturbance_rejection_step == 1) { display_parameter = rotor_position_steps/load_disturbance_sensitivity_scale; }
 			else if (enable_noise_rejection_step == 1) { noise_rej_signal = rotor_control_target_steps; }
 			else if (enable_sensitivity_fnc_step == 1)  { display_parameter = rotor_position_command_steps - rotor_position_steps; }
 			else { display_parameter = rotor_position_steps; }
