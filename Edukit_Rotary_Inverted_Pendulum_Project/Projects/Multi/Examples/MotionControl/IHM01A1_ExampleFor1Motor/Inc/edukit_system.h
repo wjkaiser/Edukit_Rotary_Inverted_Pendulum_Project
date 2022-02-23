@@ -284,8 +284,8 @@
 #define ENABLE_SWING_UP 1						// Enable Pendulum Swing Up system
 #define SWING_UP_CONTROL_CONFIG_DELAY 3000 		// Delay in cycles prior to switching from Swing Up controller to user selected controller
 #define STAGE_0_AMP 200							// Swing Up Impulse amplitude for initial state
-#define STAGE_1_AMP 120							// Swing Up Impulse amplitude for intermediate state
-#define STAGE_2_AMP 100							// Swing Up Impulse amplitude for final state
+#define STAGE_1_AMP 130							// Swing Up Impulse amplitude for intermediate state
+#define STAGE_2_AMP 120							// Swing Up Impulse amplitude for final state
 
 
 
