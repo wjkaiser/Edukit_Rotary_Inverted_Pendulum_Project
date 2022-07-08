@@ -1357,6 +1357,11 @@ int main(void) {
 					RxBuffer_WriteIdx, UART_RX_BUFFER_SIZE, &Msg);
 
 			config_command = 0;
+			/* Test for NULL message received corresponding to keyboard Carriage Return */
+			if (readBytes == 1){
+				RxBuffer_ReadIdx = (RxBuffer_ReadIdx + readBytes) % UART_RX_BUFFER_SIZE;
+				continue;
+			}
 			/* Test for message received */
 			if (readBytes == 2 && Msg.Len == 1 && i % 10 == 0){
 				RxBuffer_ReadIdx = (RxBuffer_ReadIdx + readBytes) % UART_RX_BUFFER_SIZE;

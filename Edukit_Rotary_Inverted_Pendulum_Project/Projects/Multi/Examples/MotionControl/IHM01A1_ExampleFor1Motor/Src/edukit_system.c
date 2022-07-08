@@ -954,7 +954,7 @@ void user_configuration(void){
 				enable_rotor_plant_design = 0;
 				enable_rotor_plant_gain_design = 0;
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				enable_mod_sin_rotor_tracking = 0;
@@ -967,7 +967,7 @@ void user_configuration(void){
 						strlen(msg), HAL_MAX_DELAY);
 
 				enable_angle_cal = 0;
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable...................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -976,7 +976,7 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_angle_cal_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -984,7 +984,7 @@ void user_configuration(void){
 
 				enable_swing_up = ENABLE_SWING_UP;
 				enable_swing_up_resp = 0;
-				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable.......................................: ");
+				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable.....................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_swing_up_resp);
 				if (enable_swing_up_resp == 1){
@@ -993,45 +993,45 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_swing_up_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_swing_up_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 				if (enable_rotor_chirp == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_position_step_response_cycle);
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_mod_sin_rotor_tracking < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1040,13 +1040,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable..................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_tracking_comb_signal);
 					sprintf(msg, "%i", enable_rotor_tracking_comb_signal);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_tracking_comb_signal < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1104,11 +1104,11 @@ void user_configuration(void){
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg), HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				enable_angle_cal = 0;
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable...................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -1117,7 +1117,7 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_angle_cal_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1125,39 +1125,39 @@ void user_configuration(void){
 
 
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 				if (enable_rotor_chirp == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_position_step_response_cycle);
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				}
 				if ( enable_mod_sin_rotor_tracking < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1165,13 +1165,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable..................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_tracking_comb_signal);
 					sprintf(msg, "%i", enable_rotor_tracking_comb_signal);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_tracking_comb_signal < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1228,11 +1228,11 @@ void user_configuration(void){
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg), HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				enable_angle_cal = 0;
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.................. ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable................ ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -1241,7 +1241,7 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_angle_cal_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1249,7 +1249,7 @@ void user_configuration(void){
 
 				enable_swing_up = ENABLE_SWING_UP;
 				enable_swing_up_resp = 0;
-				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable.......................................: ");
+				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable.....................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_swing_up_resp);
 				if (enable_swing_up_resp == 1){
@@ -1258,19 +1258,19 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_swing_up_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_swing_up_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart**************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1283,19 +1283,19 @@ void user_configuration(void){
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_mod_sin_rotor_tracking < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1304,13 +1304,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable..................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_tracking_comb_signal);
 					sprintf(msg, "%i", enable_rotor_tracking_comb_signal);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_tracking_comb_signal < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1360,11 +1360,11 @@ void user_configuration(void){
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg), HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				enable_angle_cal = 0;
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable...................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -1373,45 +1373,45 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_angle_cal_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 				if (enable_rotor_chirp == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_position_step_response_cycle);
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_mod_sin_rotor_tracking < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1420,13 +1420,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable..................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_tracking_comb_signal);
 					sprintf(msg, "%i", enable_rotor_tracking_comb_signal);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_tracking_comb_signal < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1471,16 +1471,16 @@ void user_configuration(void){
 				/* Flush read buffer  */
 				for (k = 0; k < SERIAL_MSG_MAXLEN; k++) { Msg.Data[k] = 0; }
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\rEnter 0 for Dual PID - Enter 1 for State Feedback...........................: ");
+				sprintf(msg, "\n\rEnter 0 for Dual PID - Enter 1 for State Feedback.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_state_feedback);
 				sprintf(msg, "%i", enable_state_feedback);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_state_feedback < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1497,67 +1497,67 @@ void user_configuration(void){
 					rotor_i_gain = 0;
 					feedforward_gain = 1;
 
-					sprintf(msg, "\n\rEnter Pendulum Angle Gain...................................................: ");
+					sprintf(msg, "\n\rEnter Pendulum Angle Gain.................................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &proportional);
 					sprintf(msg, "%0.2f", proportional);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( proportional < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Pendulum Angle Derivative Gain........................................: ");
+					sprintf(msg, "\n\rEnter Pendulum Angle Derivative Gain......................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &derivative);
 					sprintf(msg, "%0.2f", derivative);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( derivative < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Rotor Angle Gain......................................................: ");
+					sprintf(msg, "\n\rEnter Rotor Angle Gain....................................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_p_gain);
 					sprintf(msg, "%0.2f", rotor_p_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( rotor_p_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Rotor Angle Derivative Gain...........................................: ");
+					sprintf(msg, "\n\rEnter Rotor Angle Derivative Gain.........................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_d_gain);
 					sprintf(msg, "%0.2f", rotor_d_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( rotor_d_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Integral Compensator Gain (zero to disable)...........................: ");
+					sprintf(msg, "\n\rEnter Integral Compensator Gain (zero to disable).........................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &integral_compensator_gain);
 					sprintf(msg, "%0.2f", integral_compensator_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( integral_compensator_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Feedforward Gain (return or zero to set to unity).....................: ");
+					sprintf(msg, "\n\rEnter Feedforward Gain (return or zero to set to unity)...................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &feedforward_gain);
 					if (feedforward_gain == 0){
@@ -1576,7 +1576,7 @@ void user_configuration(void){
 
 				if (enable_state_feedback == 0){
 
-					sprintf(msg, "\n\rEnter Pendulum PID Proportional Gain........................................: ");
+					sprintf(msg, "\n\rEnter Pendulum PID Proportional Gain......................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 							strlen(msg),
 							HAL_MAX_DELAY);
@@ -1585,13 +1585,13 @@ void user_configuration(void){
 					sprintf(msg, "%0.2f", proportional);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( proportional < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Pendulum PID Integral Gain............................................: ");
+					sprintf(msg, "\n\rEnter Pendulum PID Integral Gain..........................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 							strlen(msg),
 							HAL_MAX_DELAY);
@@ -1599,13 +1599,13 @@ void user_configuration(void){
 					sprintf(msg, "%0.2f", integral);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( integral < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Pendulum PID Differential Gain........................................: ");
+					sprintf(msg, "\n\rEnter Pendulum PID Differential Gain......................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 							strlen(msg),
 							HAL_MAX_DELAY);
@@ -1613,13 +1613,13 @@ void user_configuration(void){
 					sprintf(msg, "%0.2f", derivative);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( derivative < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Rotor PID Proportional Gain...........................................: ");
+					sprintf(msg, "\n\rEnter Rotor PID Proportional Gain.........................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 							strlen(msg),
 							HAL_MAX_DELAY);
@@ -1628,13 +1628,13 @@ void user_configuration(void){
 					sprintf(msg, "%0.2f", rotor_p_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( rotor_p_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Rotor PID Integral Gain:..............................................: ");
+					sprintf(msg, "\n\rEnter Rotor PID Integral Gain:............................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 							strlen(msg),
 							HAL_MAX_DELAY);
@@ -1642,19 +1642,19 @@ void user_configuration(void){
 					sprintf(msg, "%0.2f", rotor_i_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( rotor_i_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter Rotor PID Differential Gain...........................................: ");
+					sprintf(msg, "\n\rEnter Rotor PID Differential Gain.........................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_d_gain);
 					sprintf(msg, "%0.2f", rotor_d_gain);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( rotor_d_gain < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1665,13 +1665,13 @@ void user_configuration(void){
 
 				select_suspended_mode = 0;
 
-				sprintf(msg, "\n\rEnter 0 for Inverted Mode - Enter 1 for Suspended Mode......................: ");
+				sprintf(msg, "\n\rEnter 0 for Inverted Mode - Enter 1 for Suspended Mode....................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &select_suspended_mode);
 				sprintf(msg, "%i", select_suspended_mode);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( select_suspended_mode < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1687,7 +1687,7 @@ void user_configuration(void){
 				enable_rotor_chirp = 0;
 
 				enable_angle_cal = 0;
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable.....................: ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable...................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -1697,7 +1697,7 @@ void user_configuration(void){
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1707,7 +1707,7 @@ void user_configuration(void){
 
 					enable_swing_up = ENABLE_SWING_UP;
 					enable_swing_up_resp = 0;
-					sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable:......................................: ");
+					sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable:....................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_swing_up_resp);
 					if (enable_swing_up_resp == 1){
@@ -1716,45 +1716,45 @@ void user_configuration(void){
 					sprintf(msg, "%i", enable_swing_up_resp);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_swing_up_resp < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 				}
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable.........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 				if (enable_rotor_chirp == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_position_step_response_cycle);
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable..................................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable................................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_mod_sin_rotor_tracking < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1763,13 +1763,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable..................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Rotor Tracking Comb Signal; 0 to Disable................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_tracking_comb_signal);
 					sprintf(msg, "%i", enable_rotor_tracking_comb_signal);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_tracking_comb_signal < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1782,13 +1782,13 @@ void user_configuration(void){
 
 				if (enable_rotor_chirp == 0 && enable_rotor_position_step_response_cycle == 0
 						&& enable_mod_sin_rotor_tracking == 0 && enable_rotor_tracking_comb_signal == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Pendulum Impulse Signal; 0 to Disable.....................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Pendulum Impulse Signal; 0 to Disable...................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_pendulum_position_impulse_response_cycle);
 					sprintf(msg, "%i", enable_pendulum_position_impulse_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_pendulum_position_impulse_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1819,12 +1819,12 @@ void user_configuration(void){
 				enable_noise_rejection_step = 0;
 				enable_sensitivity_fnc_step = 0;
 
-				sprintf(msg, "\n\rEnter 1 to Enable Disturbance Rejection Sensitivity; 0 to Disable...........: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Disturbance Rejection Sensitivity; 0 to Disable.........: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_disturbance_rejection_step);
 				sprintf(msg, "%i", enable_disturbance_rejection_step);
 				if ( enable_disturbance_rejection_step < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -1839,13 +1839,13 @@ void user_configuration(void){
 
 
 				if (enable_disturbance_rejection_step == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Noise Rejection Sensitivity; 0 to Disable.................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Noise Rejection Sensitivity; 0 to Disable...............: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_noise_rejection_step);
 					sprintf(msg, "%i", enable_noise_rejection_step);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_noise_rejection_step < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1858,13 +1858,13 @@ void user_configuration(void){
 				}
 
 				if (enable_noise_rejection_step == 0 && enable_disturbance_rejection_step == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Sensitivity Function; 0 to Disable........................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sensitivity Function; 0 to Disable......................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_sensitivity_fnc_step);
 					sprintf(msg, "%i", enable_sensitivity_fnc_step);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_sensitivity_fnc_step < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -1915,7 +1915,7 @@ void user_configuration(void){
 					}
 					if (enable_rotor_plant_design == 1) {
 						if (select_suspended_mode == 1){
-							sprintf(msg, "\n\rEnter Natural Frequency (rad/sec) of Minimum 0.5 and Maximum 2 .............: ");
+							sprintf(msg, "\n\rEnter Natural Frequency (rad/sec) of Minimum 0.5 and Maximum 2 ...........: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_natural_frequency);
 							if (rotor_natural_frequency > 2){
@@ -1928,7 +1928,7 @@ void user_configuration(void){
 							sprintf(msg, "%0.2f", rotor_natural_frequency);
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
-							sprintf(msg, "\n\rEnter Rotor Damping Coefficient of Minimum 0.1 and Maximum 5................: ");
+							sprintf(msg, "\n\rEnter Rotor Damping Coefficient of Minimum 0.1 and Maximum 5..............: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_damping_coefficient);
 							if (rotor_damping_coefficient > 5){
@@ -1947,7 +1947,7 @@ void user_configuration(void){
 						}
 
 						if (select_suspended_mode == 0 ){
-							sprintf(msg, "\n\rEnter Natural Frequency (rad/sec) of Minimum 0.5 and Maximum 2..............: ");
+							sprintf(msg, "\n\rEnter Natural Frequency (rad/sec) of Minimum 0.5 and Maximum 2............: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_natural_frequency);
 							if (rotor_natural_frequency > 5){
@@ -1960,7 +1960,7 @@ void user_configuration(void){
 							sprintf(msg, "%0.2f", rotor_natural_frequency);
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
-							sprintf(msg, "\n\rEnter Rotor Damping Coefficient of Minimum 0.5 and Maximum 5 .............. : ");
+							sprintf(msg, "\n\rEnter Rotor Damping Coefficient of Minimum 0.5 and Maximum 5 ............ : ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &rotor_damping_coefficient);
 							if (rotor_damping_coefficient > 5){
@@ -1995,13 +1995,13 @@ void user_configuration(void){
 					}
 					 */
 
-					sprintf(msg, "\n\rEnter 1 for Rotor Plant Design Grotor = 1/(s^2 + Wn*s) .....................: ");
+					sprintf(msg, "\n\rEnter 1 for Rotor Plant Design Grotor = 1/(s^2 + Wn*s) ...................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &select_rotor_plant_design);
 					sprintf(msg, "%i", select_rotor_plant_design);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( select_rotor_plant_design < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -2014,11 +2014,11 @@ void user_configuration(void){
 
 					if (enable_rotor_plant_design == 2 || enable_rotor_plant_design == 3) {
 						if (select_suspended_mode == 1){
-							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 ...................: ");
+							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 .................: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &Wo_r);
 							if ( Wo_r < 0 ){
-								sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+								sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 								HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 								HAL_Delay(3000);
 								NVIC_SystemReset();
@@ -2037,11 +2037,11 @@ void user_configuration(void){
 
 
 						if (select_suspended_mode == 0){
-							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 ...................: ");
+							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 .................: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &Wo_r);
 							if ( Wo_r < 0 ){
-								sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+								sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 								HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 								HAL_Delay(3000);
 								NVIC_SystemReset();
@@ -2072,7 +2072,7 @@ void user_configuration(void){
 					enable_rotor_plant_design = 3;
 					 */
 
-					sprintf(msg, "\n\rEnter 1 for Rotor Plant Design Grotor = 1/(s^2 + Wn*s) .....................: ");
+					sprintf(msg, "\n\rEnter 1 for Rotor Plant Design Grotor = 1/(s^2 + Wn*s) ...................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &select_rotor_plant_design);
 					sprintf(msg, "%i", select_rotor_plant_design);
@@ -2082,7 +2082,7 @@ void user_configuration(void){
 						enable_rotor_plant_design = 2;
 					}
 					if ( select_rotor_plant_design < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
@@ -2090,11 +2090,11 @@ void user_configuration(void){
 
 					if (enable_rotor_plant_design == 2 || enable_rotor_plant_design == 3) {
 						if (select_suspended_mode == 1){
-							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 ...................: ");
+							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 .................: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &Wo_r);
 							if ( Wo_r < 0 ){
-								sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+								sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 								HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 								HAL_Delay(3000);
 								NVIC_SystemReset();
@@ -2112,11 +2112,11 @@ void user_configuration(void){
 
 
 						if (select_suspended_mode == 0){
-							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 ...................: ");
+							sprintf(msg, "\n\rEnter Wn Frequency (rad/sec) of Minimum 0 and Maximum 10 .................: ");
 							HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 							read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &Wo_r);
 							if ( Wo_r < 0 ){
-								sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+								sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 								HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 								HAL_Delay(3000);
 								NVIC_SystemReset();
@@ -2138,7 +2138,7 @@ void user_configuration(void){
 				torq_current_val = MAX_TORQUE_CONFIG;
 
 				if (ENABLE_TORQUE_CURRENT_ENTRY == 1){
-					sprintf(msg, "\n\rEnter Torque Current mA (default is %i)..................................: ", (int)MAX_TORQUE_CONFIG);
+					sprintf(msg, "\n\rEnter Torque Current mA (default is %i)................................: ", (int)MAX_TORQUE_CONFIG);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_float(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &torq_current_val);
 					if (torq_current_val == 0){
@@ -2177,10 +2177,10 @@ void user_configuration(void){
 						strlen(msg),
 						HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart..... \n\r");
+				sprintf(msg, "\n\r.....Enter negative value at any prompt to correct entry and Restart... \n\r");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
-				sprintf(msg, "\n\rEnter Pendulum PID Proportional Gain ...................................: ");
+				sprintf(msg, "\n\rEnter Pendulum PID Proportional Gain .................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg),
 						HAL_MAX_DELAY);
@@ -2189,13 +2189,13 @@ void user_configuration(void){
 				sprintf(msg, "%0.2f", proportional);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( proportional < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
-				sprintf(msg, "\n\rEnter Pendulum PID Integral Gain .......................................: ");
+				sprintf(msg, "\n\rEnter Pendulum PID Integral Gain .....................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg),
 						HAL_MAX_DELAY);
@@ -2203,13 +2203,13 @@ void user_configuration(void){
 				sprintf(msg, "%0.2f", integral);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( integral < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
-				sprintf(msg, "\n\rEnter Pendulum PID Differential Gain ...................................: ");
+				sprintf(msg, "\n\rEnter Pendulum PID Differential Gain .................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg,
 						strlen(msg),
 						HAL_MAX_DELAY);
@@ -2217,7 +2217,7 @@ void user_configuration(void){
 				sprintf(msg, "%0.2f", derivative);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( derivative < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -2244,7 +2244,7 @@ void user_configuration(void){
 				enable_rotor_plant_gain_design = 0;
 				enable_angle_cal = 0;
 
-				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable ................: ");
+				sprintf(msg, "\n\rPlatform Angle Calibration Enabled - Enter 1 to Disable ..............: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_angle_cal_resp);
 				if (enable_angle_cal_resp == 0){
@@ -2253,7 +2253,7 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_angle_cal_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_angle_cal_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -2262,7 +2262,7 @@ void user_configuration(void){
 
 				enable_swing_up = ENABLE_SWING_UP;
 				enable_swing_up_resp = 0;
-				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable ..................................: ");
+				sprintf(msg, "\n\rSwing Up Enabled - Enter 1 to Disable ................................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_swing_up_resp);
 				if (enable_swing_up_resp == 1){
@@ -2271,58 +2271,58 @@ void user_configuration(void){
 				sprintf(msg, "%i", enable_swing_up_resp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_swing_up_resp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 
-				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable ......................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Rotor Chirp Drive; 0 to Disable ....................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_rotor_chirp);
 				sprintf(msg, "%i", enable_rotor_chirp);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_rotor_chirp < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
 				}
 
 				if (enable_rotor_chirp == 0){
-					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable .............................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Step Drive; 0 to Disable ...........................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx , &readBytes, &enable_rotor_position_step_response_cycle);
 					sprintf(msg, "%i", enable_rotor_position_step_response_cycle);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_rotor_position_step_response_cycle < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 
-					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable .............................: ");
+					sprintf(msg, "\n\rEnter 1 to Enable Sine Drive; 0 to Disable ...........................: ");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_mod_sin_rotor_tracking);
 					sprintf(msg, "%i", enable_mod_sin_rotor_tracking);
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					if ( enable_mod_sin_rotor_tracking < 0 ){
-						sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+						sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 						HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 						HAL_Delay(3000);
 						NVIC_SystemReset();
 					}
 				}
 
-				sprintf(msg, "\n\rEnter 1 to Enable Pendulum Impulse; 0 to Disable ...........................: ");
+				sprintf(msg, "\n\rEnter 1 to Enable Pendulum Impulse; 0 to Disable .........................: ");
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes, &enable_pendulum_position_impulse_response_cycle);
 				sprintf(msg, "%i", enable_pendulum_position_impulse_response_cycle);
 				HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 				if ( enable_pendulum_position_impulse_response_cycle < 0 ){
-					sprintf(msg, "\n\r\n\r*************************System Reset and Restart*****************************\n\r\n\r");
+					sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
 					HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 					HAL_Delay(3000);
 					NVIC_SystemReset();
@@ -2712,12 +2712,13 @@ void rotor_encoder_test(void){
 				HAL_MAX_DELAY);
 
 		L6474_CmdDisable(0);
-		while(1){
-			sprintf(msg, "Test Operation Complete, System in Standby, Press Reset Button to Restart\r\n");
-			HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
-					HAL_MAX_DELAY);
-			HAL_Delay(5000);
-		}
+		sprintf(msg, "\r\nPendulum Encoder Characterization Complete");
+		HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
+				HAL_MAX_DELAY);
+		sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
+		HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+		HAL_Delay(3000);
+		NVIC_SystemReset();
 	}
 }
 
@@ -2996,12 +2997,13 @@ void motor_actuator_characterization_mode(void){
 		j = j + 1;
 	}
 	L6474_CmdDisable(0);
-	while (1){
-		HAL_Delay(5000);
-		sprintf(msg, "\r\nMotor Characterization Terminated, Press Reset to Continue");
-		HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
-				HAL_MAX_DELAY);
-	}
+	sprintf(msg, "\r\nMotor Characterization Complete");
+	HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
+			HAL_MAX_DELAY);
+	sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
+	HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+	HAL_Delay(3000);
+	NVIC_SystemReset();
 }
 
 /*
@@ -3093,7 +3095,7 @@ void interactive_rotor_actuator_control(void){
 					rotor_position_steps, (float) ((rotor_position_steps) / STEPPER_READ_POSITION_STEPS_PER_DEGREE));
 			HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
-			sprintf(msg, "\r\nEnter 1 to Enter New Motor Configuration, 0 to Continue ...............: ");
+			sprintf(msg, "\r\nEnter 1 to Enter New Motor Configuration, 0 to Continue, -1 to Exit ...: ");
 			HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
 
 			read_int(&RxBuffer_ReadIdx, &RxBuffer_WriteIdx, &readBytes,
@@ -3101,14 +3103,22 @@ void interactive_rotor_actuator_control(void){
 			if (j == 1) {
 				break;
 			}
+			if (j == -1) {
+				break;
+			}
 
 		}
+		if (j == -1) {
+				break;
+		}
+
 	}
 	L6474_CmdDisable(0);
-	while (1){
-		HAL_Delay(5000);
-		sprintf(msg, "\r\nMotor Characterization Terminated, Press Reset to Continue");
-		HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
-				HAL_MAX_DELAY);
-	}
+	sprintf(msg, "\r\nMotor Characterization Terminated");
+	HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg),
+			HAL_MAX_DELAY);
+	sprintf(msg, "\n\r\n\r*************************System Reset and Restart***************************\n\r\n\r");
+	HAL_UART_Transmit(&huart2, (uint8_t*) msg, strlen(msg), HAL_MAX_DELAY);
+	HAL_Delay(3000);
+	NVIC_SystemReset();
 }
