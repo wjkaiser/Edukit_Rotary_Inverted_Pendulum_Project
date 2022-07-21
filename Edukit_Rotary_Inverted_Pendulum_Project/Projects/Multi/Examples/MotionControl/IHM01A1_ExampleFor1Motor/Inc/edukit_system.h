@@ -439,6 +439,16 @@ typedef struct
   float control_output; /** The controller output */
 } arm_pid_instance_a_f32;
 
+#define delayUS_ASM(us) do {\
+		asm volatile (	"MOV R0,%[loops]\n\t"\
+				"1: \n\t"\
+				"SUB R0, #1\n\t"\
+				"CMP R0, #0\n\t"\
+				"BNE 1b \n\t" : : [loops] "r" (16*us) : "memory"\
+		);\
+} while(0)
+
+__STATIC_INLINE void DWT_Delay_until_cycle(volatile uint32_t cycle);
 
 extern void pid_filter_control_execute(arm_pid_instance_a_f32 *PID, float * current_error,
 		float * sample_period, float * Deriv_Filt);
@@ -454,6 +464,12 @@ extern void user_configuration(void);
 extern void read_int(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, int * int_return);
 extern void read_float(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, float *float_return);
 extern void read_char(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, char * char_return);
+
+extern void select_mode_1(void);
+extern void user_configuration(void);
+extern int Delay_Pulse();
+extern void Main_StepClockHandler();
+extern void apply_acceleration(float * acc, float* target_velocity_prescaled, float t_sample);
 
 extern void user_prompt(void);
 extern void rotor_actuator_high_speed_test(void);
@@ -474,18 +490,34 @@ extern void assign_mode_3(arm_pid_instance_a_f32 *PID_Pend,
 
 extern bool oppositeSigns(int x, int y);
 
+extern volatile uint16_t gLastError;
+/* Private function prototypes -----------------------------------------------*/
+extern void MyFlagInterruptHandler(void);
+extern void MX_TIM3_Init(void);
+extern void MX_USART2_UART_Init(void);
+extern void read_float(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, float *float_return);
+extern void Error_Handler(uint16_t error);
+extern void read_int(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, int * int_return);
+extern void read_char(uint32_t * RxBuffer_ReadIdx, uint32_t * RxBuffer_WriteIdx , uint32_t * readBytes, char * char_return);
+extern void select_mode_1(void);
+extern void user_configuration(void);
+extern int Delay_Pulse();
+extern void Main_StepClockHandler();
+extern void apply_acceleration(float * acc, float* target_velocity_prescaled, float t_sample);
+
+
 /*
  * Timer 3, UART Transmit, and UART DMA Receive declarations
  */
 
-TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim3;
 
 /*
   * Timer 3, UART Transmit, and UART DMA Receive declarations
   */
 
-UART_HandleTypeDef huart2;
-DMA_HandleTypeDef hdma_usart2_rx;
+extern UART_HandleTypeDef huart2;
+extern DMA_HandleTypeDef hdma_usart2_rx;
 
 /*
  * UART Receive data structure
@@ -496,416 +528,437 @@ typedef struct {
 	uint8_t Data[SERIAL_MSG_MAXLEN]; /*!< Message data             */
 } T_Serial_Msg;
 
-T_Serial_Msg Msg;
+extern T_Serial_Msg Msg;
 
-uint8_t RxBuffer[UART_RX_BUFFER_SIZE];
-uint16_t Extract_Msg(uint8_t *CircularBuff, uint16_t StartPos, uint16_t LastPos,
+extern uint8_t RxBuffer[UART_RX_BUFFER_SIZE];
+extern uint16_t Extract_Msg(uint8_t *CircularBuff, uint16_t StartPos, uint16_t LastPos,
 		uint16_t BufMaxLen, T_Serial_Msg *Msg);
 
-
-
 /* Acceleration control system variables */
-volatile uint32_t apply_acc_start_time;
-volatile uint32_t clock_int_time;
-volatile uint32_t clock_int_tick;
+extern volatile uint32_t apply_acc_start_time;
+extern volatile uint32_t clock_int_time;
+extern volatile uint32_t clock_int_tick;
 
 /// PWM period variables used by step interrupt
-volatile uint32_t desired_pwm_period;
-volatile uint32_t current_pwm_period;
+extern volatile uint32_t desired_pwm_period;
+extern volatile uint32_t current_pwm_period;
 
-float target_velocity_prescaled;
-int32_t enable_speed_prescale;
+extern float target_velocity_prescaled;
+extern int32_t enable_speed_prescale;
 
 /* System data reporting */
-char tmp_string[256];
-char msg[192];
-char msg_pad[64];
-char test_msg[128];
+extern char tmp_string[256];
+extern char msg[192];
+extern char msg_pad[64];
+extern char test_msg[128];
 
 /* System timing variables */
 
-uint32_t tick, tick_cycle_current, tick_cycle_previous, tick_cycle_start,
-tick_read_cycle, tick_read_cycle_start,tick_wait_start,tick_wait;
+extern uint32_t tick, tick_cycle_current, tick_cycle_previous, tick_cycle_start,
+       tick_read_cycle, tick_read_cycle_start,tick_wait_start,tick_wait;
 
-volatile uint32_t current_cpu_cycle, prev_cpu_cycle, last_cpu_cycle, target_cpu_cycle, prev_target_cpu_cycle;
-volatile int current_cpu_cycle_delay_relative_report;
+extern volatile uint32_t current_cpu_cycle, prev_cpu_cycle, last_cpu_cycle, target_cpu_cycle, prev_target_cpu_cycle;
+extern volatile int current_cpu_cycle_delay_relative_report;
 
 uint32_t t_sample_cpu_cycles;
-float Tsample, Tsample_rotor, test_time;
-float angle_scale;
-int enable_high_speed_sampling;
+extern float Tsample, Tsample_rotor, test_time;
+extern float angle_scale;
+extern int enable_high_speed_sampling;
 
 /* Reset state tracking */
-int reset_state;
+extern int reset_state;
 
 /* Motor configuration */
-uint16_t min_speed, max_speed, max_accel, max_decel;
+extern uint16_t min_speed, max_speed, max_accel, max_decel;
 
 /* Serial interface variables */
-uint32_t RxBuffer_ReadIdx;
-uint32_t RxBuffer_WriteIdx;
-uint32_t readBytes;
+extern uint32_t RxBuffer_ReadIdx;
+extern uint32_t RxBuffer_WriteIdx;
+extern uint32_t readBytes;
 
 /* Control system output signal */
-float rotor_control_target_steps;
-float rotor_control_target_steps_curr;
-float rotor_control_target_steps_prev;
+extern float rotor_control_target_steps;
+extern float rotor_control_target_steps_curr;
+extern float rotor_control_target_steps_prev;
 
 /* Control system variables */
-int rotor_position_delta;
-int initial_rotor_position;
-int cycle_count;
-int i, j, k, m;
-int ret;
+extern int rotor_position_delta;
+extern int initial_rotor_position;
+extern int cycle_count;
+extern int i, j, k, m;
+extern int ret;
 
 /* PID control system variables */
-float windup, rotor_windup;
-float *current_error_steps, *current_error_rotor_steps;
-float *sample_period, *sample_period_rotor;
+extern float windup, rotor_windup;
+extern float *current_error_steps, *current_error_rotor_steps;
+extern float *sample_period, *sample_period_rotor;
 
 /* Loop timing measurement variables */
-int cycle_period_start;
-int cycle_period_sum;
-int enable_cycle_delay_warning;
+extern int cycle_period_start;
+extern int cycle_period_sum;
+extern int enable_cycle_delay_warning;
 
 /* PID control variables */
-float *deriv_lp_corner_f;
-float *deriv_lp_corner_f_rotor;
-float proportional, rotor_p_gain;
-float integral, rotor_i_gain;
-float derivative, rotor_d_gain;
+extern float *deriv_lp_corner_f;
+extern float *deriv_lp_corner_f_rotor;
+extern float proportional, rotor_p_gain;
+extern float integral, rotor_i_gain;
+extern float derivative, rotor_d_gain;
 
 /* State Feedback variables */
-int enable_state_feedback;
-float integral_compensator_gain;
-float feedforward_gain;
-float current_error_rotor_integral;
+extern int enable_state_feedback;
+extern float integral_compensator_gain;
+extern float feedforward_gain;
+extern float current_error_rotor_integral;
 
 /* Reference tracking command */
-float reference_tracking_command;
+extern float reference_tracking_command;
 
 /* Pendulum position and tracking command */
 
 /* Rotor position and tracking command */
-int rotor_position_steps;
-float rotor_position_command_steps;
-float rotor_position_command_steps_pf, rotor_position_command_steps_pf_prev;
-float rotor_position_command_deg;
-float rotor_position_steps_prev, rotor_position_filter_steps, rotor_position_filter_steps_prev;
-float rotor_position_diff, rotor_position_diff_prev;
-float rotor_position_diff_filter, rotor_position_diff_filter_prev;
-int rotor_target_in_steps;
-int initial_rotor_position;
+extern int rotor_position_steps;
+extern float rotor_position_command_steps;
+extern float rotor_position_command_steps_pf, rotor_position_command_steps_pf_prev;
+extern float rotor_position_command_deg;
+extern float rotor_position_steps_prev, rotor_position_filter_steps, rotor_position_filter_steps_prev;
+extern float rotor_position_diff, rotor_position_diff_prev;
+extern float rotor_position_diff_filter, rotor_position_diff_filter_prev;
+extern int rotor_target_in_steps;
+extern int initial_rotor_position;
 
 /* Rotor Plant Design variables */
-int select_rotor_plant_design, enable_rotor_plant_design, enable_rotor_plant_gain_design;
-int rotor_control_target_steps_int;
-float rotor_damping_coefficient, rotor_natural_frequency;
-float rotor_plant_gain;
-float rotor_control_target_steps_gain;
-float rotor_control_target_steps_filter_2, rotor_control_target_steps_filter_prev_2;
-float rotor_control_target_steps_prev_prev, rotor_control_target_steps_filter_prev_prev_2;
-float c0, c1, c2, c3, c4, ao, Wn2;
-float fo_r, Wo_r, IWon_r, iir_0_r, iir_1_r, iir_2_r;
+extern int select_rotor_plant_design, enable_rotor_plant_design, enable_rotor_plant_gain_design;
+extern int rotor_control_target_steps_int;
+extern float rotor_damping_coefficient, rotor_natural_frequency;
+extern float rotor_plant_gain;
+extern float rotor_control_target_steps_gain;
+extern float rotor_control_target_steps_filter_2, rotor_control_target_steps_filter_prev_2;
+extern float rotor_control_target_steps_prev_prev, rotor_control_target_steps_filter_prev_prev_2;
+extern float c0, c1, c2, c3, c4, ao, Wn2;
+extern float fo_r, Wo_r, IWon_r, iir_0_r, iir_1_r, iir_2_r;
 
 /* Encoder position variables */
-uint32_t cnt3;
-int range_error;
-float encoder_position;
-int encoder_position_steps;
-int encoder_position_init;
-int previous_encoder_position;
-int max_encoder_position;
-int global_max_encoder_position;
-int prev_global_max_encoder_position;
-int encoder_position_down;
-int encoder_position_curr;
-int encoder_position_prev;
+extern uint32_t cnt3;
+extern int range_error;
+extern float encoder_position;
+extern int encoder_position_steps;
+extern int encoder_position_init;
+extern int previous_encoder_position;
+extern int max_encoder_position;
+extern int global_max_encoder_position;
+extern int prev_global_max_encoder_position;
+extern int encoder_position_down;
+extern int encoder_position_curr;
+extern int encoder_position_prev;
 
 /* Angle calibration variables */
-float encoder_position_offset;
-float encoder_position_offset_zero;
-int enable_angle_cal;
-int enable_angle_cal_resp;
-int offset_end_state;
-int offset_start_index;
-int angle_index;
-int angle_avg_index;
-int angle_avg_span;
-int offset_angle[ANGLE_CAL_OFFSET_STEP_COUNT + 2];
-float encoder_position_offset_avg[ANGLE_CAL_OFFSET_STEP_COUNT + 2];
-int angle_cal_end;
-int angle_cal_complete;
+extern float encoder_position_offset;
+extern float encoder_position_offset_zero;
+extern int enable_angle_cal;
+extern int enable_angle_cal_resp;
+extern int offset_end_state;
+extern int offset_start_index;
+extern int angle_index;
+extern int angle_avg_index;
+extern int angle_avg_span;
+extern int offset_angle[ANGLE_CAL_OFFSET_STEP_COUNT + 2];
+extern float encoder_position_offset_avg[ANGLE_CAL_OFFSET_STEP_COUNT + 2];
+extern int angle_cal_end;
+extern int angle_cal_complete;
 
 /* Swing Up system variables */
-int enable_swing_up;
-int enable_swing_up_resp;
-bool peaked;
-bool handled_peak;
-int zero_crossed;
-motorDir_t swing_up_direction;
-int swing_up_state, swing_up_state_prev;
-int stage_count;
-int stage_amp;
+extern int enable_swing_up;
+extern int enable_swing_up_resp;
+extern bool peaked;
+extern bool handled_peak;
+extern int zero_crossed;
+extern motorDir_t swing_up_direction;
+extern int swing_up_state, swing_up_state_prev;
+extern int stage_count;
+extern int stage_amp;
 
 /* Initial control state parameter storage */
-float init_r_p_gain, init_r_i_gain, init_r_d_gain;
-float init_p_p_gain, init_p_i_gain, init_p_d_gain;
-int init_enable_state_feedback;
-float init_integral_compensator_gain;
-float init_feedforward_gain;
-int init_enable_state_feedback;
-int init_enable_disturbance_rejection_step;
-int init_enable_sensitivity_fnc_step;
-int init_enable_noise_rejection_step;
-int init_enable_rotor_plant_design;
-int init_enable_rotor_plant_gain_design;
+extern float init_r_p_gain, init_r_i_gain, init_r_d_gain;
+extern float init_p_p_gain, init_p_i_gain, init_p_d_gain;
+extern int init_enable_state_feedback;
+extern float init_integral_compensator_gain;
+extern float init_feedforward_gain;
+extern int init_enable_state_feedback;
+extern int init_enable_disturbance_rejection_step;
+extern int init_enable_sensitivity_fnc_step;
+extern int init_enable_noise_rejection_step;
+extern int init_enable_rotor_plant_design;
+extern int init_enable_rotor_plant_gain_design;
 
 
 /* Low pass filter variables */
-float fo, Wo, IWon, iir_0, iir_1, iir_2;
-float fo_LT, Wo_LT, IWon_LT;
-float iir_LT_0, iir_LT_1, iir_LT_2;
-float fo_s, Wo_s, IWon_s, iir_0_s, iir_1_s, iir_2_s;
+extern float fo, Wo, IWon, iir_0, iir_1, iir_2;
+extern float fo_LT, Wo_LT, IWon_LT;
+extern float iir_LT_0, iir_LT_1, iir_LT_2;
+extern float fo_s, Wo_s, IWon_s, iir_0_s, iir_1_s, iir_2_s;
 
 /* Slope correction system variables */
-int slope;
-int slope_prev;
-float encoder_angle_slope_corr_steps;
+extern int slope;
+extern int slope_prev;
+extern float encoder_angle_slope_corr_steps;
 
 /* Adaptive control variables */
-float adaptive_error, adaptive_threshold_low, adaptive_threshold_high;
-float error_sum_prev, error_sum, error_sum_filter_prev, error_sum_filter;
-int adaptive_entry_tick, adaptive_dwell_period;
-int enable_adaptive_mode, adaptive_state, adaptive_state_change;
-float rotor_position_command_steps_prev;
+extern float adaptive_error, adaptive_threshold_low, adaptive_threshold_high;
+extern float error_sum_prev, error_sum, error_sum_filter_prev, error_sum_filter;
+extern int adaptive_entry_tick, adaptive_dwell_period;
+extern int enable_adaptive_mode, adaptive_state, adaptive_state_change;
+extern float rotor_position_command_steps_prev;
 
 /* Rotor impulse variables */
-int rotor_position_step_polarity;
-int impulse_start_index;
+extern int rotor_position_step_polarity;
+extern int impulse_start_index;
 
 /* User configuration variables */
-int clear_input;
+extern int clear_input;
 uint32_t enable_control_action;
-int max_speed_read, min_speed_read;
-int select_suspended_mode;
-int motor_response_model;
-int enable_rotor_actuator_test, enable_rotor_actuator_control;
-int enable_encoder_test;
-int enable_rotor_actuator_high_speed_test;
-int enable_motor_actuator_characterization_mode;
-int motor_state;
-float torq_current_val;
+extern int max_speed_read, min_speed_read;
+extern int select_suspended_mode;
+extern int motor_response_model;
+extern int enable_rotor_actuator_test, enable_rotor_actuator_control;
+extern int enable_encoder_test;
+extern int enable_rotor_actuator_high_speed_test;
+extern int enable_motor_actuator_characterization_mode;
+extern int motor_state;
+extern float torq_current_val;
 
 
 /* Rotor chirp system variables */
-int enable_rotor_chirp;
-int chirp_cycle;
-int chirp_dwell_cycle;
-float chirp_time;
-float rotor_chirp_start_freq;
-float rotor_chirp_end_freq;
-float rotor_chirp_period ;
-float rotor_chirp_frequency;
-float rotor_chirp_amplitude;
-int rotor_chirp_step_period;
+extern int enable_rotor_chirp;
+extern int chirp_cycle;
+extern int chirp_dwell_cycle;
+extern float chirp_time;
+extern float rotor_chirp_start_freq;
+extern float rotor_chirp_end_freq;
+extern float rotor_chirp_period ;
+extern float rotor_chirp_frequency;
+extern float rotor_chirp_amplitude;
+extern int rotor_chirp_step_period;
 
-float pendulum_position_command_steps;
+extern float pendulum_position_command_steps;
 
 /* Modulates sine tracking signal system variables */
-int enable_mod_sin_rotor_tracking;
-int enable_rotor_position_step_response_cycle;
-int disable_mod_sin_rotor_tracking;
-int sine_drive_transition;
-float mod_sin_amplitude;
-float rotor_control_sin_amplitude;
-float rotor_sine_drive, rotor_sine_drive_mod;
-float rotor_mod_control;
-float mod_sin_carrier_frequency;
+extern int enable_mod_sin_rotor_tracking;
+extern int enable_rotor_position_step_response_cycle;
+extern int disable_mod_sin_rotor_tracking;
+extern int sine_drive_transition;
+extern float mod_sin_amplitude;
+extern float rotor_control_sin_amplitude;
+extern float rotor_sine_drive, rotor_sine_drive_mod;
+extern float rotor_mod_control;
+extern float mod_sin_carrier_frequency;
 
 /* Pendulum impulse system variables */
-int enable_pendulum_position_impulse_response_cycle;
+extern int enable_pendulum_position_impulse_response_cycle;
 
 /* Rotor high speed test system variables */
-int swing_cycles, rotor_test_speed_min, rotor_test_speed_max;
-int rotor_test_acceleration_max, swing_deceleration_max;
-int start_angle_a[20], end_angle_a[20], motion_dwell_a[20];
-int abs_encoder_position_prior, abs_encoder_position_after, abs_encoder_position_max;
-uint16_t current_speed;
+extern int swing_cycles, rotor_test_speed_min, rotor_test_speed_max;
+extern int rotor_test_acceleration_max, swing_deceleration_max;
+extern int start_angle_a[20], end_angle_a[20], motion_dwell_a[20];
+extern int abs_encoder_position_prior, abs_encoder_position_after, abs_encoder_position_max;
+extern uint16_t current_speed;
 
 /*Pendulum system ID variable */
-int enable_pendulum_sysid_test;
+extern int enable_pendulum_sysid_test;
 
 /* Full system identification variables */
-int enable_full_sysid;
-float full_sysid_max_vel_amplitude_deg_per_s;
-float full_sysid_min_freq_hz;
-float full_sysid_max_freq_hz;
-int full_sysid_num_freqs;
-float full_sysid_freq_log_step;
-int full_sysid_start_index;
+extern int enable_full_sysid;
+extern float full_sysid_max_vel_amplitude_deg_per_s;
+extern float full_sysid_min_freq_hz;
+extern float full_sysid_max_freq_hz;
+extern int full_sysid_num_freqs;
+extern float full_sysid_freq_log_step;
+extern int full_sysid_start_index;
 
 /* Rotor comb drive system variables */
-int enable_rotor_tracking_comb_signal;
-float rotor_track_comb_signal_frequency;
-float rotor_track_comb_command;
-float rotor_track_comb_amplitude;
+extern int enable_rotor_tracking_comb_signal;
+extern float rotor_track_comb_signal_frequency;
+extern float rotor_track_comb_command;
+extern float rotor_track_comb_amplitude;
 
 /* Sensitivity function system variables */
-int enable_disturbance_rejection_step;
-int enable_noise_rejection_step;
-int enable_plant_rejection_step;
-int enable_sensitivity_fnc_step;
-float load_disturbance_sensitivity_scale;
+extern int enable_disturbance_rejection_step;
+extern int enable_noise_rejection_step;
+extern int enable_plant_rejection_step;
+extern int enable_sensitivity_fnc_step;
+extern float load_disturbance_sensitivity_scale;
 
 
 
 /* Noise rejection sensitivity function low pass filter */
 
-float noise_rej_signal_filter, noise_rej_signal;
-float noise_rej_signal_prev, noise_rej_signal_filter_prev;
+extern float noise_rej_signal_filter, noise_rej_signal;
+extern float noise_rej_signal_prev, noise_rej_signal_filter_prev;
 
 /*
  * Real time user input system variables
  */
 
-char config_message[16];
-int config_command;
-int display_parameter;
-int step_size;
-float adjust_increment;
-int mode_index;
+extern char config_message[16];
+extern int config_command;
+extern int display_parameter;
+extern int step_size;
+extern float adjust_increment;
+extern int mode_index;
 
 /* Real time data reporting index */
-int report_mode;
-int speed_scale;
-int speed_governor;
+extern int report_mode;
+extern int speed_scale;
+extern int speed_governor;
 
 /*
  * User selection mode values
  */
 
-int mode_1;				// Enable LQR Motor Model M
-int mode_2;				// Enable LRR Motor Model H
-int mode_3;				// Enable LQR Motor Model L
-int mode_4;				// Enable Suspended Mode Motor Model M
-int mode_5;				// Enable sin drive track signal
-int mode_adaptive_off;	// Disable adaptive control
-int mode_adaptive;		// Enable adaptive control
-int mode_8;				// Enable custom configuration entry
-int mode_9;				// Disable sin drive track signal
-int mode_10;			// Enable Single PID Mode with Motor Model M
-int mode_11;			// Enable rotor actuator and encoder test mode
-int mode_13;			// Enable rotor control system evaluation
-int mode_15;			// Enable interactive control of rotor actuator
-int mode_16;			// Enable load disturbance function step mode
-int mode_17;			// Enable noise disturbance function step mode
-int mode_18;			// Enable sensitivity function step mode
-int mode_19;            // Enable full system identification mode
-int mode_quit;			// Initiate exit from control loop
-int mode_interactive;	// Enable continued terminal interactive user session
-int mode_index_prev, mode_index_command;
-int mode_transition_tick;
-int mode_transition_state;
-int transition_to_adaptive_mode;
+extern int mode_1;				// Enable LQR Motor Model M
+extern int mode_2;				// Enable LRR Motor Model H
+extern int mode_3;				// Enable LQR Motor Model L
+extern int mode_4;				// Enable Suspended Mode Motor Model M
+extern int mode_5;				// Enable sin drive track signal
+extern int mode_adaptive_off;	// Disable adaptive control
+extern int mode_adaptive;		// Enable adaptive control
+extern int mode_8;				// Enable custom configuration entry
+extern int mode_9;				// Disable sin drive track signal
+extern int mode_10;			// Enable Single PID Mode with Motor Model M
+extern int mode_11;			// Enable rotor actuator and encoder test mode
+extern int mode_13;			// Enable rotor control system evaluation
+extern int mode_15;			// Enable interactive control of rotor actuator
+extern int mode_16;			// Enable load disturbance function step mode
+extern int mode_17;			// Enable noise disturbance function step mode
+extern int mode_18;			// Enable sensitivity function step mode
+extern int mode_19;            // Enable full system identification mode
+extern int mode_quit;			// Initiate exit from control loop
+extern int mode_interactive;	// Enable continued terminal interactive user session
+extern int mode_index_prev, mode_index_command;
+extern int mode_transition_tick;
+extern int mode_transition_state;
+extern int transition_to_adaptive_mode;
 
 
 /*
  * Real time user input characters
  */
 
-char mode_string_stop[UART_RX_BUFFER_SIZE];
-char mode_string_mode_1[UART_RX_BUFFER_SIZE];
-char mode_string_mode_2[UART_RX_BUFFER_SIZE];
-char mode_string_mode_3[UART_RX_BUFFER_SIZE];
-char mode_string_mode_4[UART_RX_BUFFER_SIZE];
-char mode_string_mode_8[UART_RX_BUFFER_SIZE];
-char mode_string_mode_5[UART_RX_BUFFER_SIZE];
-char mode_string_inc_accel[UART_RX_BUFFER_SIZE];
-char mode_string_dec_accel[UART_RX_BUFFER_SIZE];
-char mode_string_inc_amp[UART_RX_BUFFER_SIZE];
-char mode_string_dec_amp[UART_RX_BUFFER_SIZE];
-char mode_string_mode_single_pid[UART_RX_BUFFER_SIZE];
-char mode_string_mode_test[UART_RX_BUFFER_SIZE];
-char mode_string_mode_control[UART_RX_BUFFER_SIZE];
-char mode_string_mode_motor_characterization_mode[UART_RX_BUFFER_SIZE];
-char mode_string_mode_load_dist[UART_RX_BUFFER_SIZE];
-char mode_string_mode_load_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_mode_noise_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_mode_plant_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_mode_full_sysid[UART_RX_BUFFER_SIZE];
-char mode_string_dec_pend_p[UART_RX_BUFFER_SIZE];
-char mode_string_inc_pend_p[UART_RX_BUFFER_SIZE];
-char mode_string_dec_pend_i[UART_RX_BUFFER_SIZE];
-char mode_string_inc_pend_i[UART_RX_BUFFER_SIZE];
-char mode_string_dec_pend_d[UART_RX_BUFFER_SIZE];
-char mode_string_inc_pend_d[UART_RX_BUFFER_SIZE];
-char mode_string_dec_rotor_p[UART_RX_BUFFER_SIZE];
-char mode_string_inc_rotor_p[UART_RX_BUFFER_SIZE];
-char mode_string_dec_rotor_i[UART_RX_BUFFER_SIZE];
-char mode_string_inc_rotor_i[UART_RX_BUFFER_SIZE];
-char mode_string_dec_rotor_d[UART_RX_BUFFER_SIZE];
-char mode_string_inc_rotor_d[UART_RX_BUFFER_SIZE];
-char mode_string_dec_torq_c[UART_RX_BUFFER_SIZE];
-char mode_string_inc_torq_c[UART_RX_BUFFER_SIZE];
-char mode_string_dec_max_s[UART_RX_BUFFER_SIZE];
-char mode_string_inc_max_s[UART_RX_BUFFER_SIZE];
-char mode_string_dec_min_s[UART_RX_BUFFER_SIZE];
-char mode_string_inc_min_s[UART_RX_BUFFER_SIZE];
-char mode_string_dec_max_a[UART_RX_BUFFER_SIZE];
-char mode_string_inc_max_a[UART_RX_BUFFER_SIZE];
-char mode_string_dec_max_d[UART_RX_BUFFER_SIZE];
-char mode_string_inc_max_d[UART_RX_BUFFER_SIZE];
-char mode_string_enable_step[UART_RX_BUFFER_SIZE];
-char mode_string_disable_step[UART_RX_BUFFER_SIZE];
-char mode_string_enable_pendulum_impulse[UART_RX_BUFFER_SIZE];
-char mode_string_disable_pendulum_impulse[UART_RX_BUFFER_SIZE];
-char mode_string_enable_load_dist[UART_RX_BUFFER_SIZE];
-char mode_string_disable_load_dist[UART_RX_BUFFER_SIZE];
-char mode_string_enable_noise_rej_step[UART_RX_BUFFER_SIZE];
-char mode_string_disable_noise_rej_step[UART_RX_BUFFER_SIZE];
-char mode_string_disable_sensitivity_fnc_step[UART_RX_BUFFER_SIZE];
-char mode_string_enable_sensitivity_fnc_step[UART_RX_BUFFER_SIZE];
-char mode_string_inc_step_size[UART_RX_BUFFER_SIZE];
-char mode_string_dec_step_size[UART_RX_BUFFER_SIZE];
-char mode_string_select_mode_5[UART_RX_BUFFER_SIZE];
-char mode_string_enable_high_speed_sampling[UART_RX_BUFFER_SIZE];
-char mode_string_disable_high_speed_sampling[UART_RX_BUFFER_SIZE];
-char mode_string_enable_speed_prescale[UART_RX_BUFFER_SIZE];
-char mode_string_disable_speed_prescale[UART_RX_BUFFER_SIZE];
-char mode_string_disable_speed_governor[UART_RX_BUFFER_SIZE];
-char mode_string_enable_speed_governor[UART_RX_BUFFER_SIZE];
-char mode_string_reset_system[UART_RX_BUFFER_SIZE];
+extern char mode_string_stop[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_1[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_2[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_3[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_4[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_8[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_5[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_accel[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_accel[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_amp[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_amp[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_single_pid[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_test[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_control[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_motor_characterization_mode[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_load_dist[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_load_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_noise_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_plant_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_full_sysid[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_pend_p[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_pend_p[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_pend_i[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_pend_i[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_pend_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_pend_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_rotor_p[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_rotor_p[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_rotor_i[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_rotor_i[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_rotor_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_rotor_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_torq_c[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_torq_c[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_max_s[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_max_s[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_min_s[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_min_s[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_max_a[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_max_a[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_max_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_max_d[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_pendulum_impulse[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_pendulum_impulse[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_load_dist[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_load_dist[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_noise_rej_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_noise_rej_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_sensitivity_fnc_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_sensitivity_fnc_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_step_size[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_step_size[UART_RX_BUFFER_SIZE];
+extern char mode_string_select_mode_5[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_high_speed_sampling[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_high_speed_sampling[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_speed_prescale[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_speed_prescale[UART_RX_BUFFER_SIZE];
+extern char mode_string_disable_speed_governor[UART_RX_BUFFER_SIZE];
+extern char mode_string_enable_speed_governor[UART_RX_BUFFER_SIZE];
+extern char mode_string_reset_system[UART_RX_BUFFER_SIZE];
 
 
-int char_mode_select;	// Flag detecting whether character mode select entered
+extern int char_mode_select;	// Flag detecting whether character mode select entered
 
 
-char message_received[UART_RX_BUFFER_SIZE];
-char mode_string_mode_1[UART_RX_BUFFER_SIZE];
-char mode_string_mode_2[UART_RX_BUFFER_SIZE];
-char mode_string_mode_3[UART_RX_BUFFER_SIZE];
-char mode_string_mode_4[UART_RX_BUFFER_SIZE];
-char mode_string_mode_5[UART_RX_BUFFER_SIZE];
-char mode_string_mode_8[UART_RX_BUFFER_SIZE];
-char mode_string_mode_single_pid[UART_RX_BUFFER_SIZE];
-char mode_string_mode_test[UART_RX_BUFFER_SIZE];
-char mode_string_mode_control[UART_RX_BUFFER_SIZE];
-char mode_string_mode_high_speed_test[UART_RX_BUFFER_SIZE];
-char mode_string_mode_motor_characterization_mode[UART_RX_BUFFER_SIZE];
-char mode_string_mode_pendulum_sysid_test[UART_RX_BUFFER_SIZE];
-char mode_string_dec_accel[UART_RX_BUFFER_SIZE];
-char mode_string_inc_accel[UART_RX_BUFFER_SIZE];
-char mode_string_inc_amp[UART_RX_BUFFER_SIZE];
-char mode_string_dec_amp[UART_RX_BUFFER_SIZE];
-char mode_string_mode_load_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_mode_noise_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_mode_plant_dist_step[UART_RX_BUFFER_SIZE];
-char mode_string_stop[UART_RX_BUFFER_SIZE];
+extern char message_received[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_1[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_2[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_3[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_4[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_5[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_8[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_single_pid[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_test[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_control[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_high_speed_test[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_motor_characterization_mode[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_pendulum_sysid_test[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_accel[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_accel[UART_RX_BUFFER_SIZE];
+extern char mode_string_inc_amp[UART_RX_BUFFER_SIZE];
+extern char mode_string_dec_amp[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_load_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_noise_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_mode_plant_dist_step[UART_RX_BUFFER_SIZE];
+extern char mode_string_stop[UART_RX_BUFFER_SIZE];
 
 /* CMSIS Variables */
 arm_pid_instance_a_f32 PID_Pend, PID_Rotor;
-float Deriv_Filt_Pend[2];
-float Deriv_Filt_Rotor[2];
-float Wo_t, fo_t, IWon_t;
+extern float Deriv_Filt_Pend[2];
+extern float Deriv_Filt_Rotor[2];
+extern float Wo_t, fo_t, IWon_t;
 
+/* System timing variables */
+
+extern uint32_t tick, tick_cycle_current, tick_cycle_previous, tick_cycle_start,
+       tick_read_cycle, tick_read_cycle_start,tick_wait_start,tick_wait;
+
+extern volatile uint32_t current_cpu_cycle, prev_cpu_cycle, last_cpu_cycle, target_cpu_cycle, prev_target_cpu_cycle;
+extern volatile int current_cpu_cycle_delay_relative_report;
+
+extern uint32_t t_sample_cpu_cycles;
+extern float Tsample, Tsample_rotor, test_time;
+extern float angle_scale;
+extern int enable_high_speed_sampling;
+
+/* Reset state tracking */
+extern int reset_state;
+
+/* Motor configuration */
+extern uint16_t min_speed, max_speed, max_accel, max_decel;
+
+/* Serial interface variables */
+extern uint32_t RxBuffer_ReadIdx;
+extern uint32_t RxBuffer_WriteIdx;
+extern uint32_t readBytes;
